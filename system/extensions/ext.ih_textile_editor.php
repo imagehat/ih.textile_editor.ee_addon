@@ -1,22 +1,10 @@
 <?php
 /*
 	
-    Textile Editor Helper (TEH) extension for ExpressionEngine Version 1.1.0 (build 20080726)
+    Textile Editor Helper (TEH) extension for ExpressionEngine Version 1.2.0 (build 20090328)
 
     EE extension by Mike Kroll, www.imagehat.com
     Port of Textile Editor by Dave Olson, slateinfo.blogs.wvu.edu
-
-    Version 1.1.0 - Ported js from Prototype to jQuery
-                  - Added option to encode email addresses to use pMcode 
-                    [email=email@address.com]Text Here[/email]
-                    Defaults to a plain mailto link as before.
-    Version 1.0.4 - Added help custom button and extension setting to define the url
-    Version 1.0.3 - Fixed a bug in the original script where a space was added to the 
-                    beginning of list items
-    Version 1.0.2 - Added auto-toggling of TEH toolbar when formatting select dropdown is changed. 
-                  - Cleaned up custom buttons javascript. Compressed prototype.js.
-    Version 1.0.1 - Added custom buttons for links and email links
-    Version 1.0.0 - Initial release
 
     ------------------------------------------------------------------------------	
     Textile Editor v0.2
@@ -63,7 +51,7 @@ class Ih_textile_editor
 	var $settings		= array();
 	
 	var $name			= 'Textile Editor Helper (TEH)';
-	var $version		= '1.1.0';
+	var $version		= '1.2.0';
 	var $description	= 'Makes all Textareas set to use Textile formatting in the Publish area WYSIWYG-ish';
 	var $settings_exist	= 'y';
 	var $docs_url		= 'http://slateinfo.blogs.wvu.edu/plugins/textile_editor_helper/';
@@ -107,7 +95,6 @@ class Ih_textile_editor
 </script>
 
 <link rel="stylesheet" href="'.trim($this->settings['teh_path']).'stylesheets/textile-editor.css" type="text/css" media="screen">
-<script type="text/javascript" src="'.trim($this->settings['jquery_url']).'"></script>
 <script type="text/javascript" src="'.trim($this->settings['teh_path']).'javascripts/textile-editor.js"></script>
 <script type="text/javascript" src="'.trim($this->settings['teh_path']).'javascripts/textile-editor-config.js"></script>
 
@@ -156,26 +143,6 @@ class Ih_textile_editor
   
     
     /**
-	 * Extension settings
-	 *
-	 **/
-    function settings()
-    {
-    	global $PREFS;
-    	
-    	$settings = array();
-    	
-		$settings['jquery_url']	  = $PREFS->ini('site_url', TRUE).'teh/javascripts/jquery.js';    	
-		$settings['teh_path']	  = $PREFS->ini('site_url', TRUE).'teh/';
-		$settings['help_url']     = 'http://hobix.com/textile/';
-		$settings['encode_email'] = array('r', array('yes' => "yes", 'no' => "no"), 'no');
-    	   	
-    	return $settings;
-    }
-    // END settings
-
-    
-    /**
 	 * Activate extension
 	 *
 	 **/
@@ -183,14 +150,14 @@ class Ih_textile_editor
     {
     	global $DB, $PREFS;
     	
-    	$default_settings = $this->settings();
+    	$default_settings = serialize($this->default_settings());
     	
     	$DB->query($DB->insert_string('exp_extensions',
     								  array('extension_id'	=> '',
     										'class'			=> get_class($this),
     										'method'		=> "add_header",
     										'hook'			=> "publish_form_headers",
-    										'settings'		=> serialize($default_settings),
+    										'settings'		=> $default_settings,
     										'priority'		=> 10,
     										'version'		=> $this->version,
     										'enabled'		=> "y"
@@ -224,6 +191,11 @@ class Ih_textile_editor
     		$sql[] = "UPDATE exp_extensions SET settings = '" . addslashes(serialize($this->settings)) . "' WHERE class = '" . get_class($this) . "'";
     	}
     	
+    	if ($current < '1.2.0')
+    	{
+    	    // Nothing needed
+    	}
+    	
     	// Update version    	
     	$sql[] = "UPDATE exp_extensions SET version = '".$DB->escape_str($this->version)."' WHERE class = '" . get_class($this) . "'";
     	
@@ -247,7 +219,44 @@ class Ih_textile_editor
 		$DB->query("DELETE FROM exp_extensions WHERE class = '" . get_class($this) . "'");
 	}
 	
+	/**
+	 * Extension settings
+	 *
+	 **/
+    function settings()
+    {
+    	global $PREFS;
+    	
+    	$settings = array();
+    	
+		$settings['teh_path']	  = '';
+		$settings['help_url']     = '';
+		$settings['encode_email'] = array('r', array('yes' => "yes", 'no' => "no"), 'no');
+    	   	
+    	return $settings;
+    }
+    // END settings
+    
+    
+    /**
+	 * Default Extension settings
+	 *
+	 * @since version 1.2.0
+	 **/
+    function default_settings()
+    {
+    	$default_settings = array(
+    	    'teh_path'	   => $PREFS->ini('theme_folder_url').'teh_themes/',
+    		'help_url'     => 'http://hobix.com/textile/',
+    		'encode_email' => 'no'
+    	);
+    	   	
+    	return $default_settings;
+    }
+    // END Default settings
+	
 }
-// END Class
 
-?>
+
+/* End of file ext.ih_textile_editor.php */
+/* Location: ./system/extensions/ext.ih_textile_editor.php */
