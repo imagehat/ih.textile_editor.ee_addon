@@ -1,7 +1,9 @@
+// -------------------------------------------------------------
 //  Standard TEH buttons
+// -------------------------------------------------------------
 //  Delete or comment out the ones you want to disable.
 
-var teButtons = $.TextileEditor.buttons;
+var teButtons = jQuery.TextileEditor.buttons;
 
 teButtons.push(new TextileEditorButton('ed_strong', 'bold.png', '*', '*', 'b', 'Bold','s'));
 teButtons.push(new TextileEditorButton('ed_emphasis', 'italic.png', '_', '_', 'i', 'Italicize','s'));
@@ -23,31 +25,33 @@ teButtons.push(new TextileEditorButton('ed_justifyr', 'right.png', '>', '\n', 'r
 teButtons.push(new TextileEditorButton('ed_justify', 'justify.png', '<>', '\n', 'j', 'Justify'));
 //teButtons.push(new TextileEditorButton('[id]', '[image.png]', '[open]', '[close]', '[accesskey]', '[Title]', '[simple or extended]'));
 
-// Add the new custom buttons
+
+// -------------------------------------------------------------
+//  Custom button additions
+// -------------------------------------------------------------
+// Delete or comment out the ones you want to disable.
+
 teButtons.push(new TextileEditorButtonSeparator(''));
 teButtons.push("<button id=\"ed_link\" onclick=\"addLink(this, 'link');return false;\" class=\"standard\"><img src=\""+teh_options.image_path+"world_link.png\" title=\"Link\" alt=\"Link\" /></button>");
 teButtons.push("<button id=\"ed_email\" onclick=\"addLink(this, 'email');return false;\" class=\"standard\"><img src=\""+teh_options.image_path+"email_link.png\" title=\"Email\" alt=\"Email\" /></button>");
 teButtons.push("<button id=\"ed_help\" onclick=\"teh_help('"+teh_options.help_url+"');return false;\" class=\"standard\"><img src=\""+teh_options.image_path+"help.png\" title=\"Help\" alt=\"Help\" /></button>");
 
 
-// -----------------------------------------------------------
-//  Custom button functions additions
-// -----------------------------------------------------------
-
-// Help link
+// Open Help link in new window
+// Called from custom Help button
 function teh_help(url) {
 	window.open(url, "_blank");
 	return false;
 }
-	
-// Link callback function. Adds url or mailto link
-// based on id of 'link' or 'email', respectively
+
+// Insert link into text field. 
+// Called from linkDialog
 function addLink(button, id)
 {
 	var myField = document.getElementById(button.canvas);
 	myField.focus();
 
-	// Selection testing straight from TEH script 
+	// Selection testing straight from TEH script --------------
 	var textSelected = false;
 	var FF = false;
 
@@ -90,10 +94,10 @@ function addLink(button, id)
 		if (startPos != endPos) {
 			textSelected = true;
 		}
-	} // End selection testing
+	}
+	// End selection testing -----------------------------------
 	
-	var FinalText = '';
-	
+		
 	// Prompt user
 	switch(id) {
 		case 'link':
@@ -105,13 +109,13 @@ function addLink(button, id)
 			} else {
 				link = '"Text Here":'+link+' ';
 			}
-				
+
 			break;
-		
+
 		case 'email':
 			var link = prompt("Enter an email address:");
 			if (link == "" || link == null) return false;
-			
+
 			// Check for encoding option and build link
 			if (teh_options.encode_email === 'yes')
 			{
@@ -127,13 +131,13 @@ function addLink(button, id)
 					link = '"'+link+'":mailto:'+link;
 				}
 			}
-		
+
 			break;
 		default:
 			return false;
 			break;
 	}
-	
+
 	// set the appropriate DOM value with the final text
 	finalText = beginningText+link+followupText;
 	if (FF == true) {
@@ -144,6 +148,16 @@ function addLink(button, id)
 		sel.text = finalText;
 	}
 	
-	button.className = 'unselected';
+	// build up the selection capture, doesn't work in IE
+	if (textSelected) {
+		myField.selectionStart = startPos;
+		myField.selectionEnd = startPos+link.length;
+	}
+	else {
+		myField.selectionStart = cursorPos+link.length;
+		myField.selectionEnd = cursorPos+link.length;
+	}
+	
+	jQuery(button).addClass('unselected');
 }
 // END custom functions

@@ -150,7 +150,7 @@ class Ih_textile_editor
     {
     	global $DB, $PREFS;
     	
-    	$default_settings = serialize($this->default_settings());
+    	$default_settings = serialize( $this->default_settings() );
     	
     	$DB->query($DB->insert_string('exp_extensions',
     								  array('extension_id'	=> '',
@@ -189,11 +189,6 @@ class Ih_textile_editor
     		
     		// Add new settings
     		$sql[] = "UPDATE exp_extensions SET settings = '" . addslashes(serialize($this->settings)) . "' WHERE class = '" . get_class($this) . "'";
-    	}
-    	
-    	if ($current < '1.2.0')
-    	{
-    	    // Nothing needed
     	}
     	
     	// Update version    	
@@ -245,6 +240,8 @@ class Ih_textile_editor
 	 **/
     function default_settings()
     {
+    	global $PREFS;
+    	
     	$default_settings = array(
     	    'teh_path'	   => $PREFS->ini('theme_folder_url').'teh_themes/',
     		'help_url'     => 'http://hobix.com/textile/',
