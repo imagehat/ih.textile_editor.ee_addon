@@ -51,12 +51,14 @@ function addLink(button, id)
 	var myField = document.getElementById(button.canvas);
 	myField.focus();
 
-	// Selection testing straight from TEH script --------------
+	// Selection testing straight from TEH ---------------------
 	var textSelected = false;
+	var finalText = '';
 	var FF = false;
 
 	// grab the text that's going to be manipulated, by browser
 	if (document.selection) { // IE support
+		
 		sel = document.selection.createRange();
 		
 		// set-up the text vars
@@ -69,12 +71,9 @@ function addLink(button, id)
 			textSelected = true;	
 		}
 
-		// check if text has been selected
-		if (sel.text.length > 0) {
-			textSelected = true;	
-		}
 	}
 	else if (myField.selectionStart || myField.selectionStart == '0') { // MOZ/FF/NS/S support
+		
 		// figure out cursor and selection positions
 		var startPos = myField.selectionStart;
 		var endPos = myField.selectionEnd;
@@ -85,66 +84,59 @@ function addLink(button, id)
 		// set-up the text vars
 		var beginningText = myField.value.substring(0, startPos);
 		var followupText = myField.value.substring(endPos, myField.value.length);
-			
-		// figure out cursor and selection positions
-		var startPos = myField.selectionStart;
-		var endPos = myField.selectionEnd;
-	
+
 		// check if text has been selected
 		if (startPos != endPos) {
 			textSelected = true;
+			var selectedText = myField.value.substring(startPos, endPos);	
 		}
 	}
 	// End selection testing -----------------------------------
 	
+	// Prompt user and build URL link
+	if (id == 'link') {
 		
-	// Prompt user
-	switch(id) {
-		case 'link':
-			var link = prompt("Enter a URL:", "http://");
-			if (link == "http://" || link == "" || link == null) return false;
+		var link = prompt("Enter a URL:", "http://");
+		if (link == "http://" || link == "" || link == null) return false;
+		
+		if (textSelected) {
+			link = '"'+selectedText+'":'+link;	
+		} else {
+			link = '"Text Here":'+link+' ';
+		}
+	}
+	
+	// Prompt user and build email link
+	if (id == 'email') {
+		
+		var link = prompt("Enter an email address:", "");
+		if (link == "" || link == null) return false;
 
+		// Check for encoding option and build link
+		if (teh_options.encode_email === 'yes')
+		{
 			if (textSelected) {
-				link = '"'+myField.value.substring(startPos, endPos)+'":'+link;	
+				link = '['+'email='+link+']'+selectedText+'[/email]';
 			} else {
-				link = '"Text Here":'+link+' ';
+				link = '[email]'+link+'[/email]';
 			}
-
-			break;
-
-		case 'email':
-			var link = prompt("Enter an email address:");
-			if (link == "" || link == null) return false;
-
-			// Check for encoding option and build link
-			if (teh_options.encode_email === 'yes')
-			{
-				if (textSelected) {
-					link = '['+'email='+link+']'+myField.value.substring(startPos, endPos)+'[/email]';
-				} else {
-					link = '[email]'+link+'[/email]';
-				}
+		} else {
+			if (textSelected) {
+				link = '"'+selectedText+'":mailto:'+link;
 			} else {
-				if (textSelected) {
-					link = '"'+myField.value.substring(startPos, endPos)+'":'+link;
-				} else {
-					link = '"'+link+'":mailto:'+link;
-				}
+				link = '"'+link+'":mailto:'+link;
 			}
-
-			break;
-		default:
-			return false;
-			break;
+		}
 	}
 
 	// set the appropriate DOM value with the final text
-	finalText = beginningText+link+followupText;
 	if (FF == true) {
+		finalText = beginningText+link+followupText;
 		myField.value = finalText;
 		myField.scrollTop = scrollTop;
 	}
 	else {
+		finalText = link;
 		sel.text = finalText;
 	}
 	

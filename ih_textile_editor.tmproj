@@ -20,8 +20,8 @@
 	<key>metaData</key>
 	<dict/>
 	<key>showFileHierarchyDrawer</key>
-	<true/>
+	<false/>
 	<key>windowFrame</key>
-	<string>{{221, -398}, {1363, 963}}</string>
+	<string>{{317, 65}, {1363, 963}}</string>
 </dict>
 </plist>

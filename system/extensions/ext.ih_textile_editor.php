@@ -243,7 +243,7 @@ class Ih_textile_editor
     	global $PREFS;
     	
     	$default_settings = array(
-    	    'teh_path'	   => $PREFS->ini('theme_folder_url').'teh_themes/',
+    	    'teh_path'	   => $PREFS->ini('theme_folder_url').'teh/',
     		'help_url'     => 'http://hobix.com/textile/',
     		'encode_email' => 'no'
     	);
