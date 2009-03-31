@@ -11,6 +11,10 @@ Version 1.2.0 - Now requires jQuery for the control panel extension, which
               - Non-IE custom functions selections enhanced.
               - Fixed a bug where new installs caused an error if
                 email settings were not saved first.
+              - Changed the default "teh" directory location to the
+                themes folder instead of site root for new installs. 
+                (Path can be changed in the extension settings. Note that
+                existing path settings will remain in tact when upgrading).
 Version 1.1.0 - Ported js from Prototype to jQuery
               - Added option to encode email addresses to use pMcode 
                 [email=email@address.com]Text Here[/email]
